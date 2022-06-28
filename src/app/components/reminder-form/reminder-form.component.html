@@ -1,0 +1,62 @@
+<div class="d-flex justify-content-between">
+    <div class="d-flex align-items-center col-6">
+        <h2 class="ps-3 pe-2 mb-3">New Reminder</h2>
+        <span *ngIf="reminder.color" [ngStyle]="{'background-color': reminder.color}"
+          class="color-box mb-3">
+        </span>
+    </div>
+
+    <i (click)="close()" class="fs-20 pe-3 clickable fa-solid fa-xmark clr-pink"></i>
+</div>
+
+<div class="w-100 text-center">
+    <mat-form-field appearance="outline" class="col-8 ps-3 pe-3 mb-3">
+        <mat-label>Description</mat-label>
+        <input required matInput name="text" #text="ngModel" ngDefaultControl [(ngModel)]="reminder.text" maxlength="30">
+        <mat-error *ngIf="text.invalid">{{ requiredFieldMessage }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-4 ps-3 pe-3 mb-3">
+        <mat-label>Type</mat-label>
+        <mat-select required ngDefaultControl [(ngModel)]="reminder.color">
+            <mat-option *ngFor="let color of colors" [value]="color.value">
+                <div class="color-option" [ngStyle]="{'background-color': color.value}">
+                    <span class="ps-3">{{ color.name }}</span>
+                </div>
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-8 ps-3 pe-3 mb-3">
+        <mat-label>Date</mat-label>
+        <input required matInput type="text" mask mask="00/00/0000" [formControl]="dateControl">
+        <mat-error>{{ getDateError() }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-4 ps-3 pe-3 mb-3">
+        <mat-label>Time</mat-label>
+        <input required matInput name="timeField" #timeField="ngModel" ngDefaultControl [(ngModel)]="time"
+          (ngModelChange)="setTimeMask($event)" mask="00:00" maxlength="5">
+        <mat-error *ngIf="timeField.invalid">{{ requiredFieldMessage }}</mat-error>
+    </mat-form-field>
+
+    <div class="d-flex" [ngClass]="{'pe-3' : reminder.weather}">
+        <mat-form-field appearance="outline" class="ps-3 pe-3 mb-3" [ngClass]="reminder.weather ? 'col-9' : 'col-12'">
+            <mat-label>City</mat-label>
+            <input matInput ngDefaultControl [(ngModel)]="reminder.city">
+        </mat-form-field>
+
+        <div *ngIf="reminder.weather" class="weather col-3 ps-2 mb-3 d-flex align-items-center justify-content-around">
+            <h3 class="m-0">{{ reminder.weather.main }}</h3>
+            <img [src]="getWeatherIcon()" alt="Open Weather API Icon">
+        </div>
+    </div>
+
+    <div class="pe-3 d-flex justify-content-end">
+        <button (click)="create()" class="btn">
+            <i class="fa-solid fa-floppy-disk pe-1"></i> Save
+        </button>
+    </div>
+</div>
+
+

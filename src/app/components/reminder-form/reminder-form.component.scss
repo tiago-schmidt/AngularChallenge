@@ -1,0 +1,61 @@
+$concrete: #352f44;
+
+::ng-deep .mat-form-field-invalid .mat-input-element {
+  caret-color: red !important;
+}
+
+::ng-deep .mat-error {
+  color: #5f0000;
+  width: fit-content;
+  padding: 0.3rem 0.75rem;
+  border-radius: 5px;
+  margin-bottom: 0.25rem;
+  font-size: 14px;
+  background-color: #ff9bd2;
+  text-align: center;
+}
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+  color: $concrete;
+}
+
+::ng-deep .mat-select-panel .mat-option {
+  padding: 0 !important;
+}
+
+.clr-pink {
+  color: #ff2ca0;
+}
+
+.color-box {
+  height: 22px;
+  width: 22px;
+  border-radius: 5px;
+  border: 1px solid #2828288f;
+  box-shadow: 2px 3px 8px -3px;
+}
+
+.color-option {
+  width: 100%;
+  height: 100%;
+  color: white;
+}
+
+h2 {
+  color: $concrete;
+}
+
+.btn {
+  background-color: $concrete;
+  color: white;
+  border: none;
+}
+
+.weather {
+  height: fit-content;
+  border-radius: 5px;
+  background-color: #4f6cdb;
+  color: white;
+  margin-top: 4px;
+  min-height: 50px;
+}

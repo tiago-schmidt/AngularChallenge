@@ -1,0 +1,43 @@
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+body {
+  background-color: #8593e453;
+}
+
+button {
+  outline: 0;
+  cursor: pointer;
+  border-radius: 5px;
+  padding: .5rem 1rem;
+}
+
+.fs-16 { font-size: 16px; }
+.fs-17 { font-size: 17px; }
+.fs-20 { font-size: 20px; }
+
+.bg-white {
+  background-color: white;
+}
+
+.bg-dark {
+  color: #fff;
+}
+
+.d-flex-aligned {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fw-bold {
+  font-weight: bold;
+}
+
+.text-faded {
+  color: rgba(28, 28, 28, 0.5);
+}
+
+.clickable {
+  cursor: pointer;
+}

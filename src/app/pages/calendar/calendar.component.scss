@@ -1,0 +1,147 @@
+$concrete: #352f44;
+$light-concrete: #e8e3f2;
+$light-purple: #7752d3;
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.header {
+  height: 10%;
+}
+
+.calendar-container {
+  width: 100%;
+  height: 90%;
+  flex-direction: column;
+}
+
+.calendar-grid {
+  display: grid;
+  width: 90%;
+  height: 88%;
+  border: .5px solid $concrete;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+.grid-five-rows {
+  grid-template-rows: .2fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+.grid-six-rows {
+  grid-template-rows: .2fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+.calendar-day {
+  border: .5px solid $concrete;
+  overflow: hidden;
+}
+
+.calendar-day > div > div > p {
+  margin-left: .1rem;
+  margin-top: .1rem;
+  margin-bottom: 0;
+  padding: .2rem .25rem;
+}
+
+.weekend {
+  background-color: $light-concrete;
+}
+
+.weekend-current {
+  color: $light-purple;
+}
+
+.today > div > div > p {
+  border-radius: 50%;
+  color: white;
+  background-color: $light-purple;
+  width: fit-content;
+  padding: .25rem .3rem;
+  line-height: normal;
+}
+
+.btn {
+  background-color: transparent;
+  color: white;
+  border: 2px solid white;
+  height: 55%;
+}
+
+.btn-dark {
+  padding: .75rem 1.5rem;
+}
+
+.me-1 {
+  margin-right: .25rem;
+}
+
+.ms-3 {
+  margin-left: 1rem;
+}
+
+.reminder {
+  margin-bottom: .1rem;
+  padding-left: .35rem;
+  border-radius: 5px;
+  color: white;
+  white-space: nowrap;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reminder span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reminder i {
+  color: white;
+}
+
+.months {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 88%;
+  margin-bottom: .5rem;
+}
+
+.months div > h1 {
+  margin-bottom: 0;
+  margin-right: .5rem;
+}
+
+.invisible {
+  position: absolute;
+  top: 0;
+}
+
+.expand-collapse-btn {
+  text-align: right;
+  padding-right: 1rem;
+  font-weight: bold;
+  color: $light-purple;
+}
+
+.absolute {
+  position: absolute;
+  width: 20%;
+  height: fit-content;
+  background-color: white;
+  border: 2px solid $concrete;
+  padding-bottom: 0.75rem;
+  margin-top: -2px;
+  margin-left: -2px;
+}
+
+.absolute-header {
+  background-color: lightgray;
+  border-bottom: 1px solid #282828;
+  margin-bottom: 0.5rem;
+}
+
+.bg-light-gray {
+  background-color: lightgray !important;
+}
