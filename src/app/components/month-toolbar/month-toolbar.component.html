@@ -1,0 +1,17 @@
+<div class="months">
+  <button (click)="goToToday()" class="btn-dark bg-dark">Today</button>
+
+  <div class="d-flex">
+      <h1>{{ date.toDate() | date: 'MMM, yyyy' }}</h1>
+  </div>
+
+  <div>
+      <button (click)="changeMonth(false)" class="btn-dark bg-dark">
+          <i class="fa-solid fa-chevron-left"></i>
+      </button>
+
+      <button (click)="changeMonth(true)" class="btn-dark bg-dark">
+          <i class="fa-solid fa-chevron-right"></i>
+      </button>
+  </div>
+</div>

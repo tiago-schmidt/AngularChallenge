@@ -14,6 +14,7 @@ $light-purple: #7752d3;
   width: 100%;
   height: 90%;
   flex-direction: column;
+  padding-bottom: 1rem;
 }
 
 .calendar-grid {
@@ -98,19 +99,6 @@ $light-purple: #7752d3;
 
 .reminder i {
   color: white;
-}
-
-.months {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 88%;
-  margin-bottom: .5rem;
-}
-
-.months div > h1 {
-  margin-bottom: 0;
-  margin-right: .5rem;
 }
 
 .invisible {

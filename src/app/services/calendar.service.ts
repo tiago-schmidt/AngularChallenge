@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { filter, from, Observable, toArray } from 'rxjs';
 
 import { Reminder } from '../interfaces/reminder';
 
@@ -28,12 +28,14 @@ export class CalendarService {
 
   list(date: Date): Observable<Reminder[]> {
     const month = date.getMonth();
-    return of(this.reminders.filter(r => r.dateTime.getMonth() == month));
+    return from(this.reminders)
+      .pipe(
+        filter(r => r.dateTime.getMonth() == month),
+        toArray()
+      );
   }
 
-  delete(reminderId: number): boolean {
-    const { length } = this.reminders;
+  delete(reminderId: number) {
     this.reminders = this.reminders.filter(r => r.id !== reminderId);
-    return length != this.reminders.length; // just to "simulate" an update made by backend, but will always return true
   }
 }

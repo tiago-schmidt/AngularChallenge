@@ -19,7 +19,7 @@
     <mat-form-field appearance="outline" class="col-4 ps-3 pe-3 mb-3">
         <mat-label>Type</mat-label>
         <mat-select required ngDefaultControl [(ngModel)]="reminder.color">
-            <mat-option *ngFor="let color of colors" [value]="color.value">
+            <mat-option *ngFor="let color of (colors$ | async)" [value]="color.value">
                 <div class="color-option" [ngStyle]="{'background-color': color.value}">
                     <span class="ps-3">{{ color.name }}</span>
                 </div>
@@ -46,7 +46,7 @@
             <input matInput ngDefaultControl [(ngModel)]="reminder.city">
         </mat-form-field>
 
-        <div *ngIf="reminder.weather" class="weather col-3 ps-2 mb-3 d-flex align-items-center justify-content-around">
+        <div *ngIf="isUpdate && reminder.weather" class="weather col-3 ps-2 mb-3 d-flex align-items-center justify-content-around">
             <h3 class="m-0">{{ reminder.weather.main }}</h3>
             <img [src]="getWeatherIcon()" alt="Open Weather API Icon">
         </div>

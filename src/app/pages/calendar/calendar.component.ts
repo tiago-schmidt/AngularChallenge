@@ -1,48 +1,47 @@
 import { MatDialog } from '@angular/material/dialog';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import * as moment from 'moment';
+import { Moment } from 'moment';
 
 import { Reminder } from 'src/app/interfaces/reminder';
 import { CalendarService } from 'src/app/services/calendar.service';
-import { WeatherService } from 'src/app/services/weather.service';
 import { ReminderFormComponent } from 'src/app/components/reminder-form/reminder-form.component';
 import { HelperMethods } from 'src/app/utils/helper-methods';
 import { CalendarDay } from 'src/app/interfaces/calendar-day';
-import { MONTHS } from 'src/app/utils/lists';
 import {
-  WEEK, DATE_PATTERN, DELETE_ERROR, FIRST_DAY, SUCCESS_DELETE, ABSOLUTE_CLASS,
+  WEEK, DATE_PATTERN, FIRST_DAY, SUCCESS_DELETE, ABSOLUTE_CLASS,
   CONTAINER_ID, SHOW_MORE_BTN_ID, CLOSE_BTN_ID, INVISIBLE_CLASS, BG_LIGHT_GRAY_CLASS,
-  ABSOLUTE_HEADER_CLASS, CLOSE_EXPANDED_INFO
+  ABSOLUTE_HEADER_CLASS,
+  CLOSE_EXPANDED_INFO
 } from 'src/app/utils/consts';
+import { WEEK_DAYS } from 'src/app/utils/streams';
 
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
-  styleUrls: ['./calendar.component.scss']
+  styleUrls: ['./calendar.component.scss'],
 })
 export class CalendarComponent implements OnInit, OnDestroy {
 
-  currentDate: moment.Moment;
+  currentDate: Moment;
   currentMonth: number;
   currentYear: number;
-  currentMonthFirstDay: moment.Moment;
-  currentMonthLastDay: moment.Moment;
+  currentMonthFirstDay: Moment;
+  currentMonthLastDay: Moment;
   pastMonthLastDay: number;
-  calendarDays: CalendarDay[];
   shouldHaveSixRows: boolean = false;
+  calendarDays$: Observable<CalendarDay[]>;
 
   onDestroy$ = new Subject<boolean>();
+  weekDays$ = WEEK_DAYS;
 
   reminders: Reminder[] = [];
-  months: readonly string[] = MONTHS;
-
   hiddenRemindersMap: Map<string, string[]> = new Map();
 
   constructor(
     private calendarService: CalendarService,
-    private weatherService: WeatherService,
     private matDialog: MatDialog,
     private helper: HelperMethods,
   ) { }
@@ -63,7 +62,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.shouldHaveSixRows = currentMonthWeeks == 5;
 
     this.pastMonthLastDay = moment(this.currentDate).subtract(1, 'month').daysInMonth();
-    this.calendarDays = this.getDaysInMonth();
+    this.setCalendarDays();
 
     this.getReminders();
   }
@@ -76,24 +75,18 @@ export class CalendarComponent implements OnInit, OnDestroy {
       });
   }
 
-  getWeather(city: string) {
-    this.weatherService.getWeatherInformation(city).subscribe({
-      next: (result) => {
-        return result;
-      },
-      error: (exception) => {
-        this.helper.handleError(exception);
-      }
-    });
-  }
-
   ngOnDestroy() {
     this.onDestroy$.next(true);
     this.onDestroy$.complete();
   }
 
+  monthChanged() {
+    this.setCalendarData(this.currentDate);
+    this.resetHiddenReminders();
+  }
+
   resetHiddenReminders() {
-    setTimeout(() => { this.hiddenRemindersMap = new Map() }, 0);
+    setTimeout(() => { this.hiddenRemindersMap.clear() }, 0);
   }
 
   openReminderForm(reminder?: Reminder) {
@@ -103,7 +96,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
       this.helper.showInfo(CLOSE_EXPANDED_INFO);
       return;
     }
-
     const dialogRef = this.matDialog.open(ReminderFormComponent, {
       width: '45%',
       data: {
@@ -114,10 +106,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if(!result) return;
 
-      if(!result.isUpdate)
-        this.calendarService.create(result.reminder);
-      else
-        this.calendarService.edit(reminder, result.reminder);
+      result.isUpdate
+        ? this.calendarService.edit(reminder, result.reminder)
+        : this.calendarService.create(result.reminder);
 
       this.getReminders();
     });
@@ -125,12 +116,15 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   getCalendarDayReminders(calendarDay: CalendarDay) {
     const calendarDate = this.getShortDate(calendarDay);
-    return this.reminders.filter(r => {
-      return calendarDate === moment(r.dateTime).format(DATE_PATTERN)
-    });
+    const reminders = this.reminders.filter(r => calendarDate === moment(r.dateTime).format(DATE_PATTERN))
+      .sort((r1, r2) => r1.dateTime.getTime() - r2.dateTime.getTime());
+
+    calendarDay.reminders = reminders;
+
+    return reminders.filter(r => !this.shouldHide(calendarDay, r));
   }
 
-  getDaysInMonth() {
+  setCalendarDays() {
     let calendarDays: CalendarDay[] = [];
 
     // ex: pastMonthLastDay is 31
@@ -150,7 +144,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
     for(let i = 1; calendarDays.length < calendarCells; i++) {
       calendarDays.push(this.newCalendarDay(i, calendarDays.length + 1, false));
     }
-    return calendarDays;
+
+    this.calendarDays$ = of(calendarDays);
   }
 
   newCalendarDay(day: number, days: number, isCurrentMonth: boolean = true): CalendarDay {
@@ -158,21 +153,31 @@ export class CalendarComponent implements OnInit, OnDestroy {
       day,
       month: isCurrentMonth ? this.currentMonth : this.currentMonth + 1,
       year: this.currentYear,
-      weekend: this.checkWeekend(days),
+      isWeekend: this.checkWeekend(days),
       isCurrentMonth,
       reminders: []
     }
   }
 
-  checkWeekend(days: number) {
+  checkWeekend(days: number): boolean {
     // it's weekend at first position then at every 7th and 8th day
     return days == 1 || days % 7 == 0 || (days - 1) % 7 == 0;
   }
 
-  getCalendarDayClass(calendarDay: CalendarDay) {
+  calendarDayClass(calendarDay: CalendarDay) {
     const isToday = this.getShortDate(calendarDay) === this.currentDate.format(DATE_PATTERN);
     const today = isToday && calendarDay.isCurrentMonth ? 'today' : '';
-    return `${today} ${calendarDay.weekend ? 'weekend' : 'bg-white'}`;
+    const weekendClass = calendarDay.isWeekend ? 'weekend' : 'bg-white';
+    return `${today} ${weekendClass}`;
+  }
+
+  calendarDayNumberClass(calendarDay: CalendarDay) {
+    const { isWeekend, isCurrentMonth } = calendarDay;
+    return {
+      'weekend-current': isCurrentMonth && isWeekend,
+      'fw-bold': isCurrentMonth,
+      'text-faded': !isCurrentMonth
+    }
   }
 
   getShortDate(date: CalendarDay) {
@@ -184,29 +189,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
   delete(event: MouseEvent, reminderId: number) {
     event.stopImmediatePropagation();
 
-    const deleted = this.calendarService.delete(reminderId);
-    if(deleted) {
-      this.helper.showSuccess(SUCCESS_DELETE);
-      this.getReminders();
-    } else {
-      this.helper.showError(DELETE_ERROR);
-    }
-  }
-
-  goToToday() {
-    this.setCalendarData();
-  }
-
-  nextMonth() {
-    this.currentDate.add(1, 'month');
-    this.setCalendarData(this.currentDate);
-    this.resetHiddenReminders();
-  }
-
-  previousMonth() {
-    this.currentDate.subtract(1, 'month');
-    this.setCalendarData(this.currentDate);
-    this.resetHiddenReminders();
+    this.calendarService.delete(reminderId);
+    this.helper.showSuccess(SUCCESS_DELETE);
+    this.getReminders();
   }
 
   getCalendarDayId(calendarDay: CalendarDay) {
@@ -247,13 +232,10 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   collapseOrExpandReminders(calendarDay: CalendarDay, event: MouseEvent) {
-    // using timeout so angular can rerender changes
     setTimeout(() => event.stopImmediatePropagation(), 0);
 
     const containerId = CONTAINER_ID + this.getCalendarDayId(calendarDay);
     if(this.checkThereIsOneExpanded(containerId)) {
-      // this if check is a workaround
-      // TODO: fix this as soon as there is time available
       this.helper.showInfo(CLOSE_EXPANDED_INFO);
       return;
     }

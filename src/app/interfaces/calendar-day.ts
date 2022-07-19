@@ -4,7 +4,7 @@ export interface CalendarDay {
   day: number;
   month: number;
   year: number;
-  weekend: boolean;
+  isWeekend: boolean;
   isCurrentMonth: boolean;
-  reminders?: Reminder[];
+  reminders: Reminder[];
 }

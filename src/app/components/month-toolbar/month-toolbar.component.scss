@@ -1,0 +1,16 @@
+:host {
+  width: 88%;
+  margin: auto;
+}
+
+.months {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: .5rem;
+}
+
+.months div > h1 {
+  margin-bottom: 0;
+  margin-right: .5rem;
+}

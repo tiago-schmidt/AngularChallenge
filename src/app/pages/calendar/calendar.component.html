@@ -11,41 +11,24 @@
 
 
 <div class="calendar-container d-flex-aligned">
-    <div class="months">
-        <button (click)="goToToday()" class="btn-dark bg-dark">Today</button>
-
-        <div class="d-flex">
-            <h1>{{ months[currentDate.month()] }},</h1>
-            <h1>{{ currentDate.year() }}</h1>
-        </div>
-
-        <div>
-            <button (click)="previousMonth()" class="btn-dark bg-dark">
-                <i class="fa-solid fa-chevron-left"></i>
-            </button>
-
-            <button (click)="nextMonth()" class="btn-dark bg-dark">
-                <i class="fa-solid fa-chevron-right"></i>
-            </button>
-        </div>
-    </div>
+    <app-month-toolbar (monthChanged)="monthChanged()" (selectedToday)="setCalendarData()" [date]="currentDate">
+    </app-month-toolbar>
 
     <div class="calendar-grid" [ngClass]="shouldHaveSixRows ? 'grid-six-rows' : 'grid-five-rows'">
-        <div *ngFor="let weekDay of ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']"
-          class="bg-dark d-flex-aligned" >
+        <div *ngFor="let weekDay of (weekDays$ | async)" class="bg-dark d-flex-aligned" >
             <span>{{ weekDay }}</span>
         </div>
 
-        <div *ngFor="let calendarDay of calendarDays" class="calendar-day" [ngClass]="getCalendarDayClass(calendarDay)"
+        <div *ngFor="let calendarDay of (calendarDays$ | async)" class="calendar-day" [ngClass]="calendarDayClass(calendarDay)"
           [id]="getCalendarDayId(calendarDay)">
             <div class="reminders-container" [id]="'container' + getCalendarDayId(calendarDay)">
                 <div class="d-flex align-items-center justify-content-between">
-                    <p [ngClass]="calendarDay.isCurrentMonth ? calendarDay.weekend ? 'weekend-current fw-bold' : 'fw-bold' : 'text-faded'">
+                    <p [ngClass]="calendarDayNumberClass(calendarDay)">
                       {{ calendarDay.day }}
                     </p>
 
                     <div *ngIf="getHiddenRemindersMap(getCalendarDayId(calendarDay))" class="d-flex-aligned"
-                      [ngClass]="calendarDay.weekend ? 'weekend' : 'bg-white'">
+                      [ngClass]="calendarDay.isWeekend ? 'weekend' : 'bg-white'">
                         <span class="expand-collapse-btn clickable" [id]="'btn-more' + getCalendarDayId(calendarDay)"
                           (click)="collapseOrExpandReminders(calendarDay, $event)">
                             +{{getHiddenRemindersMap(getCalendarDayId(calendarDay))}} more
@@ -58,8 +41,7 @@
                 </div>
 
                 <div *ngFor="let reminder of getCalendarDayReminders(calendarDay)" class="clickable reminder ms-3 me-3"
-                  [ngStyle]="{'background-color': reminder.color}" (click)="openReminderForm(reminder)"
-                  [ngClass]="shouldHide(calendarDay, reminder) ? 'invisible' : ''" [id]="reminder.id">
+                  [ngStyle]="{'background-color': reminder.color}" (click)="openReminderForm(reminder)" [id]="reminder.id">
                     <span class="pe-2">{{ reminder.text }}</span>
                     <i (click)="delete($event, reminder.id)" class="fa-solid fa-xmark ps-2 pe-2"></i>
                 </div>

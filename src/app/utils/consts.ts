@@ -1,3 +1,5 @@
+import { Reminder } from "../interfaces/reminder";
+
 // URLS
 export const OPEN_WHEATER_API_KEY = 'c46d2c52586a81c43ec28fda763964c9';
 export const OPEN_WHEATER_BASE_URL = 'https://api.openweathermap.org/data/2.5/weather?q=';

@@ -11,9 +11,9 @@ export class TimeMaskPipe implements PipeTransform {
 
       switch(length) {
         case 1: return value;
-        case 2: return `${Number.parseInt(value.substring(0,2)) >= 24 ? 23 : value.substring(0,2)}`;
+        case 2: return `${parseInt(value.substring(0,2)) >= 24 ? 23 : value.substring(0,2)}`;
         case 3: return `${value.substring(0,2)}:${value.substring(2,3)}`;
-        case 4: default: return `${value.substring(0,2)}:${Number.parseInt(value.substring(2,4)) >= 60 ? 59 : value.substring(2,4)}`;
+        case 4: default: return `${value.substring(0,2)}:${parseInt(value.substring(2,4)) >= 60 ? 59 : value.substring(2,4)}`;
       }
     }
     return value;

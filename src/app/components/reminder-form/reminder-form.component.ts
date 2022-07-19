@@ -1,13 +1,14 @@
 import { AfterContentInit, Component, Inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Observable } from 'rxjs';
 import * as moment from 'moment';
 
 import { Reminder } from 'src/app/interfaces/reminder';
 import { WeatherService } from 'src/app/services/weather.service';
 import { CITY_NOT_FOUND, DATE_TIME_PATTERN, FULL_TIME, INVALID_FORM_MSG, NOT_FOUND, OPEN_WHEATER_ICON_URL, REQUIRED_FIELD_MSG, SUCCESS_SAVE } from 'src/app/utils/consts';
 import { HelperMethods } from 'src/app/utils/helper-methods';
-import { COLORS } from 'src/app/utils/lists';
+import { COLORS } from 'src/app/utils/streams';
 import { TimeMaskPipe } from 'src/app/utils/masks/time-mask.pipe';
 
 @Component({
@@ -22,7 +23,7 @@ export class ReminderFormComponent implements AfterContentInit {
   time: string = '';
   timeMask: TimeMaskPipe = new TimeMaskPipe();
 
-  colors: readonly any[] = COLORS;
+  colors$: Observable<readonly any[]> = COLORS;
 
   requiredFieldMessage: string = REQUIRED_FIELD_MSG;
 
@@ -102,7 +103,7 @@ export class ReminderFormComponent implements AfterContentInit {
 
   save() {
     this.setReminderDateTime();
-    setTimeout(() => { this.helper.showSuccess(SUCCESS_SAVE) }, 0);
+    this.helper.showSuccess(SUCCESS_SAVE);
     this.dialogRef.close({ reminder: this.reminder, isUpdate: this.isUpdate });
   }
 
